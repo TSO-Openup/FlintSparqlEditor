@@ -6,6 +6,10 @@ Released 23 June 2011
 
 http://openuplabs.tso.co.uk/demos/sparqleditor
 
+Bug reports/discussion at 
+
+https://groups.google.com/group/flint-sparql-editor
+
 Created by TSO - www.tso.co.uk
 
 If you have comments, suggestions or bug reports, please send them to opendata@tso.co.uk.  If you are deploying Flint on your site, please let us know and we'll keep you informed of new releases.
