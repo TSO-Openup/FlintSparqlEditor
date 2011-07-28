@@ -19,6 +19,12 @@ function FlintEditor(container, imagesPath, config) {
 	var markerHandle = null;
 	var showResultsInSitu = true;
 	var cm;
+	this.windowClosing = false;
+		
+	// don't display dialogs when navigating away from page
+	$(window).bind('beforeunload', function(event) {    
+		editor.windowClosing = true;		
+	});		
 
 	this.allKeywords=
 	    [
@@ -97,7 +103,7 @@ function FlintEditor(container, imagesPath, config) {
 		var endpointItem = createEndpointBar.getItems()[0];
 		var endpointGetInfoButton = createEndpointBar.getItems()[2];
 		var endpointMimeTypeItem = createEndpointBar.getItems()[3];
-		endpointMimeTypeItem.setDisableElements("select");
+		endpointMimeTypeItem.setDisableElements("SELECT");
 		
 		endpointGetInfoButton.setClickAction(
 		    function() {
@@ -152,7 +158,7 @@ function FlintEditor(container, imagesPath, config) {
 	    
 	    // Get a handle to the formats bar
 	    var datasetMimeTypeItem = createCoolbar.getItems()[2];
-	    datasetMimeTypeItem.setDisableElements("select");
+	    datasetMimeTypeItem.setDisableElements("SELECT");
 
 	    // Add errorbox - this reuses the standard Flint dialog
 	    var errorBox = new FlintError(flint);
@@ -227,11 +233,23 @@ function FlintEditor(container, imagesPath, config) {
 		}
 		catch (e) {errorBox.show(e);}
 	    }
+		
+		this.sendIEDatasetQuery = function() {
+			$("#" + editorId).attr('action', datasetItems.getEndpoint());
+		}
+		
+		this.sendIEEndpointQuery = function() {
+			$("#" + editorId).attr('action', endpointItem.getEndpoint());
+		}
 	    
 	    if (!$.browser.msie) {
 		submitItemCoolbar.setSubmitAction(this.sendDatasetQuery);
 		submitItemEndpointBar.setSubmitAction(this.sendEndpointQuery);
 	    }
+		else {
+		submitItemCoolbar.setSubmitAction(this.sendIEDatasetQuery);
+		submitItemEndpointBar.setSubmitAction(this.sendIEEndpointQuery);
+		}
 
 	    
 	    //----------------------------------------------------------------
@@ -703,7 +721,7 @@ function FlintEditor(container, imagesPath, config) {
 	    this.toggleTools = function() {$('#flint-sidebar-grabber').click();}
 	    
 	    this.showEndpointBar = function() {
-		createCoolbar.hide();
+		createCoolbar.hide();		
 		createEndpointBar.show();
 		createToolbar.setEnabled("Show Endpoints", false);
 		createToolbar.setEnabled("Show Datasets", true);
@@ -767,11 +785,13 @@ function FlintEditor(container, imagesPath, config) {
     function FlintError(editor) {
 	
 	this.show = function(message) {
-	    try {
-		editor.getConfirmDialog().setCloseAction();
-		editor.getConfirmDialog().show("Flint Error", "<p>" + message.toString() + "</p>", true);
-	    }
-	    catch (e) {alert(e);}
+			try {
+			
+			editor.getConfirmDialog().setCloseAction();
+			editor.getConfirmDialog().show("Flint Error", "<p>" + message.toString() + "</p>", true);
+			}
+			catch (e) {alert(e);}
+		
 	}
     }
 
@@ -787,22 +807,25 @@ function FlintEditor(container, imagesPath, config) {
     }
 
 
-    function FlintDialog(editor) {
+    function FlintDialog() {
 
 	var button = "";
 	var closeAction = {};
 	
 	this.show = function(title, text, closeOnly) {
-	    $('#flint-dialog-title-text').text(title);
-	    $('#flint-dialog-text').html(text);
-	    if (closeOnly) {
-		$('#flint-dialog-okay-button').css('visibility', 'hidden');
-	    }
-	    else {
-		$('#flint-dialog-okay-button').css('visibility', 'visible');
-	    }
-	    $('.flint-dialog-body').css('margin-top', ($('#flint-editor').position().top + 200) + "px");
-	    $('#flint-dialog').css('visibility', 'visible');
+		
+		if (!editor.windowClosing) {
+			$('#flint-dialog-title-text').text(title);
+			$('#flint-dialog-text').html(text);
+			if (closeOnly) {
+			$('#flint-dialog-okay-button').css('visibility', 'hidden');
+			}
+			else {
+			$('#flint-dialog-okay-button').css('visibility', 'visible');
+			}
+			$('.flint-dialog-body').css('margin-top', ($('#flint-editor').position().top + 200) + "px");
+			$('#flint-dialog').css('visibility', 'visible');
+		}
 	}
 	
 	this.getResult = function() {
@@ -1105,10 +1128,16 @@ function FlintEditor(container, imagesPath, config) {
 
 	this.hide = function() {
 	    $('#flint-endpoint-bar').hide();
+		
+		// disable form elements
+		barItems[3].setDisableElements("HIDE");
 	}
 
 	this.show = function() {
 	    $('#flint-endpoint-bar').show();
+		
+		// disable form elements
+		barItems[3].setDisableElements("SHOW");
 	}
 
 	this.display = function(container) {
@@ -1133,11 +1162,13 @@ function FlintEditor(container, imagesPath, config) {
 	catch (e) {editor.getErrorBox().show(e);}
 
 	this.hide = function() {
-	    $('#flint-coolbar').hide();
+	    $('#flint-coolbar').hide();			
+		coolbarItems[2].setDisableElements("HIDE");
 	}
 
 	this.show = function() {
-	    $('#flint-coolbar').show();
+	    $('#flint-coolbar').show();		
+		coolbarItems[2].setDisableElements("SHOW");
 	}
 
 	this.display = function(container) {
@@ -1179,7 +1210,10 @@ function FlintEditor(container, imagesPath, config) {
 	    }		
 
 	    this.display = function(container) {
-		$('#' + container).append("<div id='flint-endpoint-input' title='Enter the endpoint that you wish to query'><h2>Endpoint</h2><input id='flint-endpoint-url' type='text' value='http://semantic.ckan.net/sparql/' name='endpoint'></div>");
+		
+		var endpoint = 'http://semantic.ckan.net/sparql/';
+			
+		$('#' + container).append("<div id='flint-endpoint-input' title='Enter the endpoint that you wish to query'><h2>Endpoint</h2><input id='flint-endpoint-url' type='text' value='" + endpoint + "' name='endpoint'></div>");
 	    }		
 
 	    this.getEndpoint = function() {return $("#flint-endpoint-url").val();}		
@@ -1206,11 +1240,18 @@ function FlintEditor(container, imagesPath, config) {
 
 	    this.display = function(container) {
 		var listItems = "";
-		for (var i = 0; i < datasetItems.length; i ++) {
-		    listItems += "<option value='" + datasetItems[i].uri + "'>" +datasetItems[i].name + "</option>";
+		
+		// if only 1 dataset, display disabled textbox instead of dropdown
+		if (datasetItems.length == 1) {
+			$('#' + container).append("<div id='flint-dataset'><h2>Dataset</h2><input disabled='disabled' type=text id='flint-dataset-select' name='kb' value='" + datasetItems[0].uri  + "' /></div>");
 		}
-		$('#' + container).append("<div id='flint-dataset' title='Select the endpoint that you wish to query'><h2>Dataset</h2><select id='flint-dataset-select' name='kb'>" + listItems + "</select></div>");
-	    }
+		else {
+			for (var i = 0; i < datasetItems.length; i ++) {
+				listItems += "<option value='" + datasetItems[i].uri + "'>" +datasetItems[i].name + "</option>";
+			}
+			$('#' + container).append("<div id='flint-dataset' title='Select the endpoint that you wish to query'><h2>Dataset</h2><select id='flint-dataset-select' name='kb'>" + listItems + "</select></div>");
+			}
+		}
 	    
 	    this.getEndpoint = function() {return $("#flint-dataset-select").val();}
 	    
@@ -1264,39 +1305,82 @@ function FlintEditor(container, imagesPath, config) {
     }
 
     function FlintEndpointMimeTypePicker(config, editor) {
-
-	this.setDisableElements = function(queryType)  {
-	    try {
-		if (queryType == "SELECT") {
-		    $('#flint-endpoint-mimeset-select-chooser').show(300);	
-		    $('#flint-endpoint-mimeset-construct-chooser').hide();	
-		} 
-		else if (queryType == "CONSTRUCT" || queryType == "DESCRIBE") {
-		    $('#flint-endpoint-mimeset-construct-chooser').show(300);
-		    $('#flint-endpoint-mimeset-select-chooser').hide();	
-		}
-	    }
-	    catch (e) {editor.getErrorBox().show(e);}
-	} ;
+		
+		var lastQueryType;
+		
+		this.setDisableElements = function(queryType)  {
+			try {
+			
+			if (queryType == "SHOW") {
+				queryType = lastQueryType;
+			}
+			else if (queryType == "HIDE") {
+				$('#flint-endpoint-mimeset-select, #flint-endpoint-mimeset-construct').attr('disabled', 'disabled');
+			}
+			
+			if (queryType == "SELECT") {
+				$('#flint-endpoint-mimeset-select-chooser').show(300);			
+				$('#flint-endpoint-mimeset-construct-chooser').hide();
+				
+				if ($('#flint-endpoint-bar').is(':visible')) {
+					$('#flint-endpoint-mimeset-select').attr('disabled', '');
+					$('#flint-endpoint-mimeset-construct').attr('disabled', 'disabled');
+				}
+				else {
+					$('#flint-endpoint-mimeset-select, #flint-endpoint-mimeset-construct').attr('disabled', 'disabled');
+				}
+				
+				lastQueryType = queryType;
+				
+				//$('#flint-endpoint-mimeset-select').removeAttr('disabled');			
+				
+								
+			} 
+			else if (queryType == "CONSTRUCT" || queryType == "DESCRIBE") {
+				$('#flint-endpoint-mimeset-construct-chooser').show(300);			
+				$('#flint-endpoint-mimeset-select-chooser').hide();
+				
+				if ($('#flint-endpoint-bar').is(':visible')) {
+					$('#flint-endpoint-mimeset-construct').attr('disabled', '');
+					$('#flint-endpoint-mimeset-select').attr('disabled', 'disabled');
+				}
+				else {
+					$('#flint-endpoint-mimeset-select, #flint-endpoint-mimeset-construct').attr('disabled', 'disabled');
+				}
+				
+				lastQueryType = queryType;
+				
+				//$('#flint-endpoint-mimeset-construct').removeAttr('disabled');					
+							
+			}			
+			}
+			catch (e) {editor.getErrorBox().show(e);}
+		} ;
 
 	this.display = function(container) {
 	    try {
 		var selectChooser = "";
 		var constructChooser = "";
+		
+		// use output parameter for IE, otherwise accept header mimetype
+		if ($.browser.msie)
+			var type = 'format';
+		else
+			var type = 'type';
 
 		for (var i = 0; i < config.defaultEndpointParameters.selectFormats.length; i++) {
-		    selectChooser += "<option value='" + config.defaultEndpointParameters.selectFormats[i].type + "'>" +config.defaultEndpointParameters.selectFormats[i].name + "</option>";
+		    selectChooser += "<option value='" + config.defaultEndpointParameters.selectFormats[i][type] + "'>" +config.defaultEndpointParameters.selectFormats[i].name + "</option>";
 		}
 
 		for (var i = 0; i < config.defaultEndpointParameters.constructFormats.length; i++) {
-		    constructChooser += "<option value='" + config.defaultEndpointParameters.constructFormats[i].type + "'>" +config.defaultEndpointParameters.constructFormats[i].name + "</option>";
+		    constructChooser += "<option value='" + config.defaultEndpointParameters.constructFormats[i][type] + "'>" +config.defaultEndpointParameters.constructFormats[i].name + "</option>";
 		}
 
 		$('#' + container).append("<div id='flint-endpoint-output-formats' title='Select the format in which you would like the results to be returned'><h2>Output Format</h2></div>");
 
-		selectChooser = "<div id='flint-endpoint-mimeset-select-chooser' title='Select the output type that you wish to request'><select id='flint-endpoint-mimeset-select' name='mime-type'>" + selectChooser + "</select></div>";
+		selectChooser = "<div id='flint-endpoint-mimeset-select-chooser' title='Select the output type that you wish to request'><select id='flint-endpoint-mimeset-select' name='output'>" + selectChooser + "</select></div>";
 
-		constructChooser = "<div id='flint-endpoint-mimeset-construct-chooser' title='Select the output type that you wish to request'><select id='flint-endpoint-mimeset-construct' name='mime-type'>" + constructChooser + "</select></div>";
+		constructChooser = "<div id='flint-endpoint-mimeset-construct-chooser' title='Select the output type that you wish to request'><select id='flint-endpoint-mimeset-construct' name='output'>" + constructChooser + "</select></div>";
 
 		$('#flint-endpoint-output-formats').append(selectChooser);			
 		$('#flint-endpoint-output-formats').append(constructChooser);		
@@ -1316,40 +1400,80 @@ function FlintEditor(container, imagesPath, config) {
 	}
     }
 
-    function FlintDatasetMimeTypePicker(config, editor) {
+    function FlintDatasetMimeTypePicker(config, editor) {	
 
-	this.setDisableElements = function(queryType)  {
-	    try {
-		if (queryType == "SELECT") {
-		    $('#flint-dataset-mimeset-select-chooser').show(300);	
-		    $('#flint-dataset-mimeset-construct-chooser').hide();	
-		} 
-		else if (queryType == "CONSTRUCT" || queryType == "DESCRIBE") {
-		    $('#flint-dataset-mimeset-construct-chooser').show(300);
-		    $('#flint-dataset-mimeset-select-chooser').hide();	
-		}
-	    }
-	    catch (e) {editor.getErrorBox().show(e);}
-	} ;
+		var lastQueryType;
+		
+		this.setDisableElements = function(queryType)  {
+			
+			try {
+			
+			if (queryType == "SHOW") {
+				queryType = lastQueryType;
+			}
+			else if (queryType == "HIDE") {
+				$('#flint-dataset-mimeset-select, #flint-dataset-mimeset-construct').attr('disabled', 'disabled');
+			}
+			
+			if (queryType == "SELECT") {				
+				
+				$('#flint-dataset-mimeset-select-chooser').show(300);	
+				$('#flint-dataset-mimeset-construct-chooser').hide();
+				
+				if ($('#flint-coolbar').is(':visible')) {
+					$('#flint-dataset-mimeset-select').attr('disabled', '');
+					$('#flint-dataset-mimeset-construct').attr('disabled', 'disabled');
+				}
+				else {
+					$('#flint-dataset-mimeset-select, #flint-dataset-mimeset-construct').attr('disabled', 'disabled');
+				}
+				
+				lastQueryType = queryType;
+				
+					
+			} 
+			else if (queryType == "CONSTRUCT" || queryType == "DESCRIBE") {
+				$('#flint-dataset-mimeset-construct-chooser').show(300);			
+				$('#flint-dataset-mimeset-select-chooser').hide();
+				
+				if ($('#flint-coolbar').is(':visible')) {
+					$('#flint-dataset-mimeset-construct').attr('disabled', '');
+					$('#flint-dataset-mimeset-select').attr('disabled', 'disabled');
+				}
+				else {
+					$('#flint-dataset-mimeset-select, #flint-dataset-mimeset-construct').attr('disabled', 'disabled');
+				}
+				
+				lastQueryType = queryType;
+			}			
+			}		
+			catch (e) {editor.getErrorBox().show(e);}
+		} ;
 
 	this.display = function(container) {
 	    try {
 		var selectChooser = "";
 		var constructChooser = "";
+		
+		// use output parameter for IE, otherwise accept header mimetype
+		if ($.browser.msie)
+			var type = 'format';
+		else
+			var type = 'type';
 
 		for (var i = 0; i < config.defaultEndpointParameters.selectFormats.length; i++) {
-		    selectChooser += "<option value='" + config.defaultEndpointParameters.selectFormats[i].type + "'>" +config.defaultEndpointParameters.selectFormats[i].name + "</option>";
+		    selectChooser += "<option value='" + config.defaultEndpointParameters.selectFormats[i][type] + "'>" +config.defaultEndpointParameters.selectFormats[i].name + "</option>";
 		}
 
 		for (var i = 0; i < config.defaultEndpointParameters.constructFormats.length; i++) {
-		    constructChooser += "<option value='" + config.defaultEndpointParameters.constructFormats[i].type + "'>" +config.defaultEndpointParameters.constructFormats[i].name + "</option>";
+		    constructChooser += "<option value='" + config.defaultEndpointParameters.constructFormats[i][type] + "'>" +config.defaultEndpointParameters.constructFormats[i].name + "</option>";
 		}
 
 		$('#' + container).append("<div id='flint-dataset-output-formats' title='Select the format in which you would like the results to be returned'><h2>Output Format</h2></div>");
 
-		selectChooser = "<div id='flint-dataset-mimeset-select-chooser' title='Select the output type that you wish to request'><select id='flint-dataset-mimeset-select' name='mime-type'>" + selectChooser + "</select></div>";
+		selectChooser = "<div id='flint-dataset-mimeset-select-chooser' title='Select the output type that you wish to request'><select id='flint-dataset-mimeset-select' name='output'>" + selectChooser + "</select></div>";
 
-		constructChooser = "<div id='flint-dataset-mimeset-construct-chooser' title='Select the output type that you wish to request'><select id='flint-dataset-mimeset-construct' name='mime-type'>" + constructChooser + "</select></div>";
+		constructChooser = "<div id='flint-dataset-mimeset-construct-chooser' title='Select the output type that you wish to request'><select id='flint-dataset-mimeset-construct' name='output'>" + constructChooser + "</select></div>";
 
 		$('#flint-dataset-output-formats').append(selectChooser);			
 		$('#flint-dataset-output-formats').append(constructChooser);		
@@ -1721,7 +1845,7 @@ function FlintEditor(container, imagesPath, config) {
 	    catch (e) {editor.getErrorBox().show(e);}
 	}
 
-	this.updateClasses = function(datasetItem) {
+	this.updateClasses = function(datasetItem) {		
 	    try {
 		if (datasetItem.classes == null) {
 		    activeDataItem = datasetItem;

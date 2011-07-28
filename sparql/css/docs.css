@@ -251,7 +251,7 @@ float: left;
 }
 
 #flint-coolbar select, #flint-endpoint-bar select {
-	float: left;
+	float: left;	
 	width: 180px;
 	margin-top: 5px;
 }
@@ -263,11 +263,11 @@ float: left;
 	width: 25px;
 }
 
-#flint-endpoint-bar input {
+#flint-endpoint-bar input , #flint-coolbar input {
 	display: block;
 	margin-top: 4px;
 	float: left;
-	width: 200px;
+	width: 250px;
 }
 
 #flint-coolbar label {
@@ -280,7 +280,7 @@ float: left;
 
 #flint-dataset, #flint-endpoint-input {
 	float: left;
-	width: 320px;
+	width: 340px;
 }
 
 #flint-editor input.flint-submit-button {

@@ -58,7 +58,8 @@ $(document).ready(function() {
 			{"name": "Education", "uri": "http://gov.tso.co.uk/education/sparql"},
 			{"name": "Ordnance Survey", "uri": "http://os.services.tso.co.uk/geo/sparql"},
 			{"name": "Transport", "uri": "http://gov.tso.co.uk/transport/sparql"},
-			{"name": "COINS", "uri": "http://gov.tso.co.uk/coins/sparql"}
+			{"name": "COINS", "uri": "http://gov.tso.co.uk/coins/sparql"},
+			{"name": "Organograms", "uri": "http://reference.data.gov.uk/organograms/sparql"}
 		]
 	}
 	var flintEd = new FlintEditor("flint-test","/script/sparql/images", flintConfig);
