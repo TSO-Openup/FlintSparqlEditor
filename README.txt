@@ -12,7 +12,7 @@ https://groups.google.com/group/flint-sparql-editor
 
 Created by TSO - www.tso.co.uk
 
-You can contact the developers on the Flint Google Group or at opendata@tso.co.uk.  If you are deploying Flint on your site, please let us know and we'll keep you informed of new releases.
+You can contact the developers on the Flint Google Group or at flintsparqleditor@tso.co.uk.  If you are deploying Flint on your site, please let us know and we'll keep you informed of new releases.
 
 
 Installation instructions
