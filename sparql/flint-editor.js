@@ -66,7 +66,7 @@ function FlintEditor(container, imagesPath, config) {
 	    this.getImagesPath = function() {return imagesPath};
 
 	    // Returns the version of the software
-	    this.getVersion = function() {return "0.5"};
+	    this.getVersion = function() {return "0.51"};
 
 	    // Returns the title of the software
 	    this.getTitle = function() {return "Flint SPARQL Editor"};
