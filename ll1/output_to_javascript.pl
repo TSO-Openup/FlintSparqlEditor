@@ -14,23 +14,36 @@ output_terminals_js:-
 	format('   { name: "~w", regex:new RegExp("^"+~w) }, ~n',[TM,TM]),
 	fail.
 output_terminals_js:-
-        write('];'),nl,
-	fail.
-output_terminals_js:-
-	tm_punct(Ps),
-	findall(Reg,member(_=Reg,Ps),Regs),
-	nl,nl,write('var punct=/^('),
-	output_as_regex_disj(Regs,''),
-	write(')/ ;'),nl,
-	fail.
-output_terminals_js:-
+        write('];'),nl,nl.
+output_keywords_js:-
 	tm_keywords(Ps),
 	findall(Reg,member(Reg,Ps),Regs),
 	nl,nl,write('var keywords=/^('),
 	output_as_regex_disj(Regs,''),
-	write(')/i ;'),nl,
-	fail.
-output_terminals_js.
+	write(')/i ;'),nl.
+output_punct_js:-
+	tm_punct(Ps),
+	findall(Reg,member(_=Reg,Ps),Regs),
+	nl,write('var punct=/^('),
+	output_as_regex_disj(Regs,''),
+	write(')/ ;'),nl,nl.
+output_top_symbol_js:-
+	start_symbol(TS),
+	format('var startSymbol="~w";~n',[TS]).
+output_default_query_type_js:-
+	default_query_type(QT),
+	format('var defaultQueryType=~w;~n',[QT]).
+output_lex_version_js:-
+	lex_version(LV),
+	format('var lexVersion="~w";~n',[LV]).
+output_accept_empty_js:-
+	accept_empty(AE),
+	format('var acceptEmpty="~w";~n',[AE]).
+
+output_vars_js([]).
+output_vars_js([Var=Val|Pairs]):-
+	format('var ~w=~w;~n',[Var,Val]),
+	output_vars_js(Pairs).
 
 output_as_regex_disj([],_).
 output_as_regex_disj([T|Ts],Prefix):-

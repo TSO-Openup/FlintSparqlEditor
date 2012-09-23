@@ -7,10 +7,11 @@ fi(NT,T) means that T can be the first terminal in NT.  The special
          token epsilon means that NT may rewrite to nothing
          (NT is "nullable").
 
-fo(NT,T, O) means that nonterminal NT can be followed by terminal T.
-            - the final argument is for debugging only, and records
-              the nonterminal from which the follower T was copied.
+fo(NT,T) means that nonterminal NT can be followed by terminal T.
+         - the final argument is for debugging only, and records
+           the nonterminal from which the follower T was copied.
 
+stephen.cresswell@tso.co.uk
 
 */
 
@@ -19,17 +20,14 @@ ll1_tables:-
 	retractall(cf(_,_)),
 	retractall(nt(_)),
 	retractall(fi(_,_)),
-	retractall(fo(_,_,_)),
+	retractall(fo(_,_)),
 	retractall(m(_,_,_)),
 	
 	validate_rules,
-	remember(change),
-%	assert_terminals,
+	remember1(change),
 	iterate_first,
-
-	remember(change),
+	remember1(change),
 	iterate_follow,
-
 	iterate_matrix.
 
 validate_rules:-
@@ -38,7 +36,8 @@ validate_rules:-
 	format("Warning: unused non-terminal: ~w~n",[NT]),
 	fail.
 validate_rules:-
-	LHS => RHS,
+	% (Check the untranslated rules)
+	LHS ==> RHS,
 	\+RHS=[],
 	\+RHS=[_|_],
 	format("Warning: atomic RHS: ~w~n",[LHS=>RHS]),
@@ -57,7 +56,7 @@ validate_rules:-
 validate_rules:-
 	declared_terminal(T),
 	\+tm(T),
-	format("Warning: declared terminal not found in grammar: ~w~n",[T]),
+	format("Declared terminal not found in grammar: ~w~n",[T]),
 	fail.
 validate_rules.
 
@@ -71,6 +70,7 @@ declared_terminal(T):-
 	tm_punct(Ts),
 	member(T=_,Ts).
 
+% Repeated until no change
 iterate_first:-
 	change,
 	!,
@@ -79,6 +79,7 @@ iterate_first:-
 	iterate_first.
 iterate_first.
 
+% All possibilities
 iterate:-
 	first(A,W),
 	remember(fi(A,W)),
@@ -120,22 +121,23 @@ iterate_f:-
 	fail.
 iterate_f.
 
-/*
-
-*/
 
 follow:-
 	B => RHS,
 	follow_list(RHS,B).
 
 follow_list([X],B):-
+	!,
 	copy_follow(B,X).
+follow_list([A|RHS],B):-
+	tm(A),!,
+	follow_list(RHS,B).	
 follow_list([A,X2|RHS],B):-
 	first_list([X2|RHS],F),
 	(F=epsilon -> 
 	    copy_follow(B,A)
         ;
-	    remember(fo(A,F, B))
+	    remember(fo(A,F))
         ),
 	follow_list([X2|RHS],B).	
 
@@ -143,23 +145,23 @@ follow_list([A,X2|RHS],B):-
 %  (applied when A can be final constituent of B)
 copy_follow(B,A):-
 	\+tm(A),
-	remember(cf(B,A)),
-	fo(B,Fo, Origin),
-	remember(fo(A,Fo, Origin)),
+	remember1(cf(B,A)),
+	fo(B,Fo),
+	remember(fo(A,Fo)),
 	fail.
-copy_follow.
+copy_follow(_,_).
 
 iterate_matrix:-
 	A => RHS,
 	first_list(RHS,F),
 	F \== epsilon,
-	remember(m(A,F,A=>RHS)),
+	remember1(m(A,F,A=>RHS)),
 	fail.
 iterate_matrix:-
 	A => RHS,
 	first_list(RHS,epsilon),
-	fo(A,F,_),
-	remember(m(A,F,A=>RHS)),
+	fo(A,F),
+	remember1(m(A,F,A=>RHS)),
 	fail.
 iterate_matrix.
 
@@ -167,36 +169,7 @@ ll1_check:-
 	m(NT,T,R1),
 	m(NT,T,R2),
 	R1@<R2,
-	format('LL(1) clash - ~w, ~w~n',[NT,T]),
+	format('LL(1) clash - ~w, ~w,~n R1=~w~n R2=~w~n',[NT,T,R1,R2]),
 	fail.
 ll1_check:-
 	write('LL(1) check complete.'),nl.
-
-
-/*
-Debugging help - 
- cf(X,Y) fact means that follow set was copied from X to Y.
- cf_trans is transitive version.  
- Can be used for debugging follow sets like this:
-
-   If a nonterminal P has suspect terminal T in its follow set,
-
-   Firstly, fo(P,T, O), will give annotation O, - 
-   which is the nonterminal from which the follower T was inherited.
-
-   Secondly, call cf_trans(+O,+P, +[], -Path)
-   will find a path between the O and P -
-     then check that P really can be last thing in O via the path,
-     - should lead to discovery of suspect rule.
-*/
-
-cf_trans(X,Y,V,V):-
-	cf(X,Y).
-cf_trans(X,Z,V0,V1):-
-	cf(Y,Z),
-	\+memberchk(Y,V0),
-	cf_trans(X,Y,[Y|V0],V1).
-
-tail(X,X).
-tail([_|Xs0],Xs1):-
-	tail(Xs0,Xs1).

@@ -2,6 +2,8 @@
 /*
   Compile EBNF rules (==>) to BNF rules (=>).
    - i.e. expanding out *, +, ?, 'or' 
+
+stephen.cresswell@tso.co.uk
 */
 
 
@@ -89,5 +91,14 @@ remember(X):-
 	call(X),
 	!.
 remember(X):-
+	%write(X),nl,
 	assertz(change),
+	assertz(X).
+
+% Do avoid duplication, but don't assert change
+remember1(X):-
+	call(X),
+	!.
+remember1(X):-
+	%write(X),nl,
 	assertz(X).
