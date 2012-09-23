@@ -2652,7 +2652,7 @@ function FlintEditor(container, imagesPath, config) {
 
 			// Returns the version of the software
 			this.getVersion = function() {
-				return "1.0.1";
+				return "1.0.2";
 			};
 
 			// Returns the title of the software
