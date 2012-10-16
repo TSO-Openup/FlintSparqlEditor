@@ -159,53 +159,40 @@ function FlintEditor(container, imagesPath, config) {
 			}
 			// It's SPARQL XML and we're in dev mode
 			if (resultsMode === "Visual"
-					&& results
-							.indexOf("http://www.w3.org/2005/sparql-results#") > 0) {
+					&& results.indexOf("http://www.w3.org/2005/sparql-results#") > 0) {
 				var devHead = "";
 				var devResults = "";
 				$(results).find("variable").each(function() {
 					devHead += "<th>" + $(this).attr("name") + "</th>";
 				});
-				$(results)
-						.find("result")
-						.each(
-								function() {
-									devResults += "<tr>";
-									$(this)
-											.find("binding")
-											.each(
-													function() {
-														$(this)
-																.find("*")
-																.each(
-																		function() {
-																			if (this.tagName === "URI") {
-																				devResults += "<td><a href='"
-																						+ $(
-																								this)
-																								.text()
-																						+ "'>"
-																						+ $(
-																								this)
-																								.text()
-																						+ "</a></td>";
-																			} else {
-																				devResults += "<td>"
-																						+ $(
-																								this)
-																								.text()
-																						+ "</td>";
-																			}
-																		});
-													});
-									devResults += "</tr>";
-								});
-				results = "<table id='flint-results-table'><thead><tr>"
-						+ devHead + "</tr></thead><tbody>" + devResults
-						+ "</tbody></table>";
+				$(results).find("result").each(
+						function() {
+							devResults += "<tr>";
+							var resultItem = $(this);
+							$(results).find("variable").each(
+									function() {
+										resultItem.find(
+												"binding[name='" + $(this).attr("name") + "']").each(
+												function() {
+													$(this).find("*").each(
+															function() {
+																if (this.tagName === "URI") {
+																	devResults += "<td><a href='"
+																			+ $(this).text() + "'>" + $(this).text()
+																			+ "</a></td>";
+																} else {
+																	devResults += "<td>" + $(this).text()
+																			+ "</td>";
+																}
+															});
+												});
+									});
+							devResults += "</tr>";
+						});
+				results = "<table id='flint-results-table'><thead><tr>" + devHead
+						+ "</tr></thead><tbody>" + devResults + "</tbody></table>";
 			} else {
-				results = "<textarea id='flint-results'>" + results
-						+ "</textarea>";
+				results = "<textarea id='flint-results'>" + results + "</textarea>";
 			}
 			this.showLoading(false);
 			try {
@@ -257,8 +244,7 @@ function FlintEditor(container, imagesPath, config) {
 		};
 	}
 
-	function FlintMenuItem(itemId, itemLabel, itemIcon, itemEnabled,
-			itemCallback) {
+	function FlintMenuItem(itemId, itemLabel, itemIcon, itemEnabled, itemCallback) {
 
 		var id = itemId;
 		var subMenu = null;
@@ -324,12 +310,12 @@ function FlintEditor(container, imagesPath, config) {
 					}));
 
 			var editMenuItems = [];
-			editMenuItems.push(new FlintMenuItem("Undo", "Undo",
-					"Undo_16x16.png", false, function() {
+			editMenuItems.push(new FlintMenuItem("Undo", "Undo", "Undo_16x16.png",
+					false, function() {
 						editor.undo();
 					}));
-			editMenuItems.push(new FlintMenuItem("Redo", "Redo",
-					"Redo_16x16.png", false, function() {
+			editMenuItems.push(new FlintMenuItem("Redo", "Redo", "Redo_16x16.png",
+					false, function() {
 						editor.redo();
 					}));
 			editMenuItems.push(new FlintMenuItem("Cut", "Cut", "Cut_16x16.png",
@@ -338,12 +324,12 @@ function FlintEditor(container, imagesPath, config) {
 					}));
 
 			var viewMenuItems = [];
-			viewMenuItems.push(new FlintMenuItem("Show Tools",
-					"Show Tools Pane", "Prev_16x16.png", true, function() {
+			viewMenuItems.push(new FlintMenuItem("Show Tools", "Show Tools Pane",
+					"Prev_16x16.png", true, function() {
 						editor.toggleTools();
 					}));
-			viewMenuItems.push(new FlintMenuItem("Hide Tools",
-					"Hide Tools Pane", "Next_16x16.png", false, function() {
+			viewMenuItems.push(new FlintMenuItem("Hide Tools", "Hide Tools Pane",
+					"Next_16x16.png", false, function() {
 						editor.toggleTools();
 					}));
 			viewMenuItems.push(new FlintMenuItem("Show Endpoints",
@@ -351,8 +337,7 @@ function FlintEditor(container, imagesPath, config) {
 						editor.showEndpointBar();
 					}));
 			viewMenuItems.push(new FlintMenuItem("Show Datasets",
-					"Show Datasets Bar", "Favorites_16x16.png", false,
-					function() {
+					"Show Datasets Bar", "Favorites_16x16.png", false, function() {
 						editor.showDataSetsBar();
 					}));
 
@@ -394,11 +379,11 @@ function FlintEditor(container, imagesPath, config) {
 						if (menuItems[i].getSubMenu()[j].getId() === id) {
 							menuItems[i].getSubMenu()[j].setEnabled(enabled);
 							if (enabled) {
-								$("#flint-submenu-item-" + i + "-" + j).attr(
-										"class", "flint-menu-enabled");
+								$("#flint-submenu-item-" + i + "-" + j).attr("class",
+										"flint-menu-enabled");
 							} else {
-								$("#flint-submenu-item-" + i + "-" + j).attr(
-										"class", "flint-menu-disabled");
+								$("#flint-submenu-item-" + i + "-" + j).attr("class",
+										"flint-menu-disabled");
 							}
 							break;
 						}
@@ -425,26 +410,22 @@ function FlintEditor(container, imagesPath, config) {
 						} else {
 							subList += "flint-menu-disabled";
 						}
-						subList += "' id='flint-submenu-item-" + i + "-" + j
-								+ "'><span>";
+						subList += "' id='flint-submenu-item-" + i + "-" + j + "'><span>";
 						if (menuItems[i].getSubMenu()[j].getIcon() !== "") {
-							subList += "<img src='" + editor.getImagesPath()
-									+ "/"
-									+ menuItems[i].getSubMenu()[j].getIcon()
-									+ "'/>";
+							subList += "<img src='" + editor.getImagesPath() + "/"
+									+ menuItems[i].getSubMenu()[j].getIcon() + "'/>";
 						} else {
 							subList += "<span class='flint-menu-filler'></span>";
 						}
 						subList += menuItems[i].getSubMenu()[j].getLabel();
 						subList += "</span></li>";
 					}
-					listItems += "<ul class='flint-submenu' id='flint-submenu-"
-							+ i + "'>" + subList + "</ul>";
+					listItems += "<ul class='flint-submenu' id='flint-submenu-" + i
+							+ "'>" + subList + "</ul>";
 				}
 				listItems += "</li>";
 			}
-			$('#' + container).append(
-					"<ul id='flint-menu'>" + listItems + "</ul>");
+			$('#' + container).append("<ul id='flint-menu'>" + listItems + "</ul>");
 
 			// Now add events
 			for (i = 0; i < menuItems.length; i++) {
@@ -496,30 +477,28 @@ function FlintEditor(container, imagesPath, config) {
 		var toolbarItems = [];
 
 		try {
-			toolbarItems.push(new FlintToolbarItem("New Query Tab",
-					"New Query Tab", "NewTab_24x24.png", true, function() {
+			toolbarItems.push(new FlintToolbarItem("New Query Tab", "New Query Tab",
+					"NewTab_24x24.png", true, function() {
 						editor.addTab();
 					}, false));
 			toolbarItems.push(new FlintToolbarItem("New", "New empty query",
 					"New_24x24.png", true, function() {
 						editor.clearEditorTextArea();
 					}, true));
-			toolbarItems.push(new FlintToolbarItem("Select",
-					"New select query", "Properties_24x24.png", true,
-					function() {
+			toolbarItems.push(new FlintToolbarItem("Select", "New select query",
+					"Properties_24x24.png", true, function() {
 						editor.insertSelectQuery();
 					}, false));
 			toolbarItems.push(new FlintToolbarItem("Construct",
 					"New construct query", "Key_24x24.png", true, function() {
 						editor.insertConstructQuery();
 					}, false));
-			toolbarItems.push(new FlintToolbarItem("Insert",
-					"New insert query", "Insert_24x24.png", true, function() {
+			toolbarItems.push(new FlintToolbarItem("Insert", "New insert query",
+					"Insert_24x24.png", true, function() {
 						editor.insertInsertQuery();
 					}, false));
-			toolbarItems.push(new FlintToolbarItem("Delete",
-					"New delete query", "DeleteQuery_24x24.png", true,
-					function() {
+			toolbarItems.push(new FlintToolbarItem("Delete", "New delete query",
+					"DeleteQuery_24x24.png", true, function() {
 						editor.insertDeleteQuery();
 					}, false));
 			toolbarItems.push(new FlintToolbarItem("Undo", "Undo last edit",
@@ -534,12 +513,12 @@ function FlintEditor(container, imagesPath, config) {
 					"Cut_24x24.png", false, function() {
 						editor.cut();
 					}, false));
-			toolbarItems.push(new FlintToolbarItem("Show Tools",
-					"Show tools pane", "Prev_24x24.png", true, function() {
+			toolbarItems.push(new FlintToolbarItem("Show Tools", "Show tools pane",
+					"Prev_24x24.png", true, function() {
 						editor.toggleTools();
 					}, true));
-			toolbarItems.push(new FlintToolbarItem("Hide Tools",
-					"Hide tools pane", "Next_24x24.png", false, function() {
+			toolbarItems.push(new FlintToolbarItem("Hide Tools", "Hide tools pane",
+					"Next_24x24.png", false, function() {
 						editor.toggleTools();
 					}, false));
 			toolbarItems.push(new FlintToolbarItem("Show Endpoints",
@@ -547,8 +526,7 @@ function FlintEditor(container, imagesPath, config) {
 						editor.showEndpointBar();
 					}, true));
 			toolbarItems.push(new FlintToolbarItem("Show Datasets",
-					"Show datasets bar", "Favorites_24x24.png", false,
-					function() {
+					"Show datasets bar", "Favorites_24x24.png", false, function() {
 						editor.showDataSetsBar();
 					}, false));
 			// toolbarItems.push(new FlintToolbarItem("FR", "Find/Replace",
@@ -599,8 +577,8 @@ function FlintEditor(container, imagesPath, config) {
 						+ toolbarItems[i].getLabel() + "' alt='"
 						+ toolbarItems[i].getLabel() + "'/></li>";
 			}
-			$('#' + container).append(
-					"<ul id='flint-toolbar'>" + listItems + "</ul>");
+			$('#' + container)
+					.append("<ul id='flint-toolbar'>" + listItems + "</ul>");
 			for (i = 0; i < toolbarItems.length; i++) {
 				$("#flint-toolbar-" + i).click(toolbarItems[i].getCallback());
 			}
@@ -683,25 +661,21 @@ function FlintEditor(container, imagesPath, config) {
 				$("#flint-" + pickerContext + "-mode-select").text("");
 				var index;
 				for (index = 0; index < modeItems.length; index++) {
-					var listItem = "<option id='flint-mode-"
-							+ modeItems[index].mode + "' value='"
-							+ modeItems[index].mode + "'>"
+					var listItem = "<option id='flint-mode-" + modeItems[index].mode
+							+ "' value='" + modeItems[index].mode + "'>"
 							+ modeItems[index].name + "</option>";
 					if (datasetItem.modes) {
 						var i;
 						for (i = 0; i < datasetItem.modes.length; i++) {
 							if (datasetItem.modes[i] === modeItems[index].mode) {
-								$("#flint-" + pickerContext + "-mode-select")
-										.append(listItem);
+								$("#flint-" + pickerContext + "-mode-select").append(listItem);
 							}
 						}
 					} else {
-						$("#flint-" + pickerContext + "-mode-select").append(
-								listItem);
+						$("#flint-" + pickerContext + "-mode-select").append(listItem);
 					}
 				}
-				$("#flint-" + pickerContext + "-mode-select option:first")
-						.change();
+				$("#flint-" + pickerContext + "-mode-select option:first").change();
 			};
 
 			this.display = function(container) {
@@ -715,15 +689,13 @@ function FlintEditor(container, imagesPath, config) {
 									"<div id='flint-"
 											+ pickerContext
 											+ "-modes'><h2>Mode</h2><input disabled='disabled' type=text id='flint-"
-											+ pickerContext
-											+ "-mode-select' name='mode' value='"
+											+ pickerContext + "-mode-select' name='mode' value='"
 											+ modeItems[0].name + "' /></div>");
 				} else {
 					var i;
 					for (i = 0; i < modeItems.length; i++) {
-						listItems += "<option id='flint-mode-"
-								+ modeItems[i].mode + "' value='"
-								+ modeItems[i].mode + "'>" + modeItems[i].name
+						listItems += "<option id='flint-mode-" + modeItems[i].mode
+								+ "' value='" + modeItems[i].mode + "'>" + modeItems[i].name
 								+ "</option>";
 					}
 					$('#' + container)
@@ -731,8 +703,7 @@ function FlintEditor(container, imagesPath, config) {
 									"<div id='flint-"
 											+ pickerContext
 											+ "-modes' title='Select the SPARQL mode'><h2>Mode</h2><select id='flint-"
-											+ pickerContext
-											+ "-mode-select' name='mode'>"
+											+ pickerContext + "-mode-select' name='mode'>"
 											+ listItems + "</select></div>");
 				}
 			};
@@ -785,13 +756,12 @@ function FlintEditor(container, imagesPath, config) {
 					$('#' + container)
 							.append(
 									"<div id='flint-dataset'><h2>Dataset</h2><input disabled='disabled' type=text id='flint-dataset-select' name='kb' value='"
-											+ datasetItems[0].uri
-											+ "' /></div>");
+											+ datasetItems[0].uri + "' /></div>");
 				} else {
 					var i;
 					for (i = 0; i < datasetItems.length; i++) {
-						listItems += "<option value='" + datasetItems[i].uri
-								+ "'>" + datasetItems[i].name + "</option>";
+						listItems += "<option value='" + datasetItems[i].uri + "'>"
+								+ datasetItems[i].name + "</option>";
 					}
 					$('#' + container)
 							.append(
@@ -889,25 +859,20 @@ function FlintEditor(container, imagesPath, config) {
 					$('#flint-endpoint-mimeset-construct-chooser').hide();
 
 					if ($('#flint-endpoint-bar').is(':visible')) {
-						$('#flint-endpoint-mimeset-select')
-								.attr('disabled', '');
-						$('#flint-endpoint-mimeset-construct').attr('disabled',
-								'disabled');
+						$('#flint-endpoint-mimeset-select').attr('disabled', '');
+						$('#flint-endpoint-mimeset-construct').attr('disabled', 'disabled');
 					} else {
 						$(
 								'#flint-endpoint-mimeset-select, #flint-endpoint-mimeset-construct')
 								.attr('disabled', 'disabled');
 					}
-				} else if (queryType === "CONSTRUCT"
-						|| queryType === "DESCRIBE") {
+				} else if (queryType === "CONSTRUCT" || queryType === "DESCRIBE") {
 					$('#flint-endpoint-mimeset-construct-chooser').show();
 					$('#flint-endpoint-mimeset-select-chooser').hide();
 
 					if ($('#flint-endpoint-bar').is(':visible')) {
-						$('#flint-endpoint-mimeset-construct').attr('disabled',
-								'');
-						$('#flint-endpoint-mimeset-select').attr('disabled',
-								'disabled');
+						$('#flint-endpoint-mimeset-construct').attr('disabled', '');
+						$('#flint-endpoint-mimeset-select').attr('disabled', 'disabled');
 					} else {
 						$(
 								'#flint-endpoint-mimeset-select, #flint-endpoint-mimeset-construct')
@@ -935,8 +900,7 @@ function FlintEditor(container, imagesPath, config) {
 				var i;
 				for (i = 0; i < config.defaultEndpointParameters.selectFormats.length; i++) {
 					selectChooser += "<option value='"
-							+ config.defaultEndpointParameters.selectFormats[i][type]
-							+ "'>"
+							+ config.defaultEndpointParameters.selectFormats[i][type] + "'>"
 							+ config.defaultEndpointParameters.selectFormats[i].name
 							+ "</option>";
 				}
@@ -1005,26 +969,20 @@ function FlintEditor(container, imagesPath, config) {
 
 					if ($('#flint-coolbar').is(':visible')) {
 						$('#flint-dataset-mimeset-select').attr('disabled', '');
-						$('#flint-dataset-mimeset-construct').attr('disabled',
-								'disabled');
+						$('#flint-dataset-mimeset-construct').attr('disabled', 'disabled');
 					} else {
-						$(
-								'#flint-dataset-mimeset-select, #flint-dataset-mimeset-construct')
+						$('#flint-dataset-mimeset-select, #flint-dataset-mimeset-construct')
 								.attr('disabled', 'disabled');
 					}
-				} else if (queryType === "CONSTRUCT"
-						|| queryType === "DESCRIBE") {
+				} else if (queryType === "CONSTRUCT" || queryType === "DESCRIBE") {
 					$('#flint-dataset-mimeset-construct-chooser').show();
 					$('#flint-dataset-mimeset-select-chooser').hide();
 
 					if ($('#flint-coolbar').is(':visible')) {
-						$('#flint-dataset-mimeset-construct').attr('disabled',
-								'');
-						$('#flint-dataset-mimeset-select').attr('disabled',
-								'disabled');
+						$('#flint-dataset-mimeset-construct').attr('disabled', '');
+						$('#flint-dataset-mimeset-select').attr('disabled', 'disabled');
 					} else {
-						$(
-								'#flint-dataset-mimeset-select, #flint-dataset-mimeset-construct')
+						$('#flint-dataset-mimeset-select, #flint-dataset-mimeset-construct')
 								.attr('disabled', 'disabled');
 					}
 				}
@@ -1048,8 +1006,7 @@ function FlintEditor(container, imagesPath, config) {
 				var i;
 				for (i = 0; i < config.defaultEndpointParameters.selectFormats.length; i++) {
 					selectChooser += "<option value='"
-							+ config.defaultEndpointParameters.selectFormats[i][type]
-							+ "'>"
+							+ config.defaultEndpointParameters.selectFormats[i][type] + "'>"
 							+ config.defaultEndpointParameters.selectFormats[i].name
 							+ "</option>";
 				}
@@ -1199,11 +1156,12 @@ function FlintEditor(container, imagesPath, config) {
 							+ ' functions group" class="flint-keyword-button flint-keyword-group-'
 							+ allKeywords[i + j][1]
 							+ '">'
-							+ allKeywords[i + j][0] + '</button></li>';
+							+ allKeywords[i + j][0]
+							+ '</button></li>';
 					if (commandFilterList.indexOf(allKeywords[i + j][1]) === -1) {
 						commandFilterList += "<li title='Filter view by "
-								+ allKeywords[i + j][1] + " keywords'>"
-								+ allKeywords[i + j][1] + "</li>";
+								+ allKeywords[i + j][1] + " keywords'>" + allKeywords[i + j][1]
+								+ "</li>";
 					}
 				}
 			}
@@ -1213,21 +1171,18 @@ function FlintEditor(container, imagesPath, config) {
 					+ commandFilterList + "</ul>";
 
 			$('#flint-sidebar-content').append(
-					commandFilterList + "<div id='flint-sidebar-commands'>"
-							+ commandList + "</div>");
+					commandFilterList + "<div id='flint-sidebar-commands'>" + commandList
+							+ "</div>");
 
 			$('#flint-sidebar-command-filter li').click(
 					function() {
-						var commandGroupStyle = "flint-keyword-group-"
-								+ $(this).text();
+						var commandGroupStyle = "flint-keyword-group-" + $(this).text();
 						if ($(this).text() === "ALL") {
 							$('#flint-command-table button').show();
 						} else {
-							$(
-									'#flint-command-table button:not(.'
-											+ commandGroupStyle + ')').hide();
-							$('#flint-command-table .' + commandGroupStyle)
-									.show();
+							$('#flint-command-table button:not(.' + commandGroupStyle + ')')
+									.hide();
+							$('#flint-command-table .' + commandGroupStyle).show();
 						}
 					});
 
@@ -1288,8 +1243,8 @@ function FlintEditor(container, imagesPath, config) {
 			if (activeDataItem.prefixes != null) {
 				var i;
 				for (i = 0; i < activeDataItem.prefixes.length; i++) {
-					prefixText += "PREFIX " + activeDataItem.prefixes[i].prefix
-							+ ": <" + activeDataItem.prefixes[i].uri + ">\n";
+					prefixText += "PREFIX " + activeDataItem.prefixes[i].prefix + ": <"
+							+ activeDataItem.prefixes[i].uri + ">\n";
 				}
 			}
 			return prefixText;
@@ -1327,8 +1282,7 @@ function FlintEditor(container, imagesPath, config) {
 						for (i = 0; i < activeDataItem.prefixes.length; i++) {
 							listText += "<li class='flint-prefix' title='"
 									+ activeDataItem.prefixes[i].name + "'>"
-									+ activeDataItem.prefixes[i].prefix
-									+ "</li>";
+									+ activeDataItem.prefixes[i].prefix + "</li>";
 						}
 						listText = "<ul>" + listText + "</ul>";
 						$('#flint-sidebar-content').append(listText);
@@ -1340,8 +1294,7 @@ function FlintEditor(container, imagesPath, config) {
 						editor.getErrorBox().show(e);
 					}
 				} else {
-					$('#flint-sidebar-content').append(
-							"<p>No prefixes available</p>");
+					$('#flint-sidebar-content').append("<p>No prefixes available</p>");
 				}
 			} else {
 				$('#flint-sidebar-content').append(
@@ -1365,48 +1318,35 @@ function FlintEditor(container, imagesPath, config) {
 									+ "</h3><p>"
 									+ activeDataItem.queries[i].description
 									+ "</p><pre class='flint-sample-content'>"
-									+ query + "</pre></div>";
+									+ query
+									+ "</pre></div>";
 						}
-						sampleText = "<div id='flint-samples'>" + sampleText
-								+ "</div>";
+						sampleText = "<div id='flint-samples'>" + sampleText + "</div>";
 						$('#flint-sidebar-content').append(sampleText);
 						$('.flint-sample-content')
 								.click(
 										function(e) {
 											var okay = true;
 											var sample = $(this);
-											if (editor.getCodeEditor()
-													.getValue() != "") {
+											if (editor.getCodeEditor().getValue() != "") {
+												editor.getConfirmDialog().setCloseAction(function() {
+													var result = editor.getConfirmDialog().getResult();
+													if (result === "Okay") {
+														var cm = editor.getCodeEditor();
+														cm.setValue("");
+														editor.insert(sample.text());
+														// Format
+														// query
+														var maxlines = cm.lineCount();
+														var ln;
+														for (ln = 0; ln < maxlines; ++ln) {
+															cm.indentLine(ln);
+														}
+													}
+												});
 												editor
 														.getConfirmDialog()
-														.setCloseAction(
-																function() {
-																	var result = editor
-																			.getConfirmDialog()
-																			.getResult();
-																	if (result === "Okay") {
-																		var cm = editor
-																				.getCodeEditor();
-																		cm
-																				.setValue("");
-																		editor
-																				.insert(sample
-																						.text());
-																		// Format
-																		// query
-																		var maxlines = cm
-																				.lineCount();
-																		var ln;
-																		for (ln = 0; ln < maxlines; ++ln) {
-																			cm
-																					.indentLine(ln);
-																		}
-																	}
-																});
-												editor
-														.getConfirmDialog()
-														.show(
-																"Insert Sample Query",
+														.show("Insert Sample Query",
 																"<p>Are you sure you want to abandon the current text?</p>");
 											}
 											e.stopPropagation();
@@ -1415,12 +1355,10 @@ function FlintEditor(container, imagesPath, config) {
 						editor.getErrorBox().show(e);
 					}
 				} else {
-					$('#flint-sidebar-content').append(
-							"<p>No samples available</p>");
+					$('#flint-sidebar-content').append("<p>No samples available</p>");
 				}
 			} else {
-				$('#flint-sidebar-content').append(
-						"<p>Samples are not applicable</p>");
+				$('#flint-sidebar-content').append("<p>Samples are not applicable</p>");
 			}
 		}
 
@@ -1446,8 +1384,7 @@ function FlintEditor(container, imagesPath, config) {
 						editor.getErrorBox().show(e);
 					}
 				} else {
-					$('#flint-sidebar-content').append(
-							"<p>No properties available</p>");
+					$('#flint-sidebar-content').append("<p>No properties available</p>");
 				}
 			} else {
 				$('#flint-sidebar-content').append(
@@ -1477,8 +1414,7 @@ function FlintEditor(container, imagesPath, config) {
 						editor.getErrorBox().show(e);
 					}
 				} else {
-					$('#flint-sidebar-content').append(
-							"<p>No classes available</p>");
+					$('#flint-sidebar-content').append("<p>No classes available</p>");
 				}
 			} else {
 				$('#flint-sidebar-content').append(
@@ -1499,8 +1435,7 @@ function FlintEditor(container, imagesPath, config) {
 			} else if (tabName === "Samples") {
 				displaySamples();
 			} else {
-				$('#flint-sidebar-sparql').attr("class",
-						"flint-sidebar-selected");
+				$('#flint-sidebar-sparql').attr("class", "flint-sidebar-selected");
 				displaySparql();
 			}
 		}
@@ -1527,51 +1462,46 @@ function FlintEditor(container, imagesPath, config) {
 									+ "<li id='flint-sidebar-samples' title='View sample queries for the current dataset'>Samples</li>"
 									+ "</ul><div id='flint-sidebar-content'></div></div>"
 									+ "<div id='flint-sidebar-grabber'><span id='flint-sidebar-grabber-button' title='Click to expand/shrink the tools pane'></span></div>");
-			$('#flint-sidebar-grabber').click(
-					function() {
-						try {
-							var editorWidth = $('#flint-editor').width();
-							if (visible) {
-								$('#flint-sidebar').css("width", "30px");
-								$('#flint-sidebar-content').css("overflow",
-										"hidden");
-								$('#flint-samples')
-										.css("white-space", "nowrap");
-								if (config.interface.toolbar) {
-									editor.getToolbar().setEnabled(
-											"Show Tools", true);
-									editor.getToolbar().setEnabled(
-											"Hide Tools", false);
-									editor.getMenu().setEnabled("Show Tools",
-											true);
-									editor.getMenu().setEnabled("Hide Tools",
-											false);
-								}
-								visible = false;
-							} else {
-								$('#flint-sidebar').css("width",
-										editorWidth / 2 + "px");
-								$('#flint-sidebar-content').css("overflow",
-										"auto");
-								$('#flint-samples').css("white-space", "wrap");
-								if (config.interface.toolbar) {
-									editor.getToolbar().setEnabled(
-											"Show Tools", false);
-									editor.getToolbar().setEnabled(
-											"Hide Tools", true);
-									editor.getMenu().setEnabled("Show Tools",
-											false);
-									editor.getMenu().setEnabled("Hide Tools",
-											true);
-								}
-								visible = true;
+			$('#flint-sidebar-grabber').click(function() {
+				try {
+					var editorWidth = $('#flint-editor').width();
+					if (visible) {
+						$('#flint-sidebar').css("width", "30px");
+						$('#flint-sidebar-content').css("overflow", "hidden");
+						$('#flint-samples').css("white-space", "nowrap");
+						if (config.interface.toolbar) {
+							if (editor.getToolbar) {
+								editor.getToolbar().setEnabled("Show Tools", true);
+								editor.getToolbar().setEnabled("Hide Tools", false);
 							}
-							// Force other UI components to resize
-							$(window).resize();
-						} catch (e) {
-							editor.getErrorBox().show(e);
+							if (editor.getMenu) {
+								editor.getMenu().setEnabled("Show Tools", true);
+								editor.getMenu().setEnabled("Hide Tools", false);
+							}
 						}
-					});
+						visible = false;
+					} else {
+						$('#flint-sidebar').css("width", editorWidth / 2 + "px");
+						$('#flint-sidebar-content').css("overflow", "auto");
+						$('#flint-samples').css("white-space", "wrap");
+						if (config.interface.toolbar) {
+							if (editor.getToolbar) {
+								editor.getToolbar().setEnabled("Show Tools", false);
+								editor.getToolbar().setEnabled("Hide Tools", true);
+							}
+							if (editor.getMenu) {
+								editor.getMenu().setEnabled("Show Tools", false);
+								editor.getMenu().setEnabled("Hide Tools", true);
+							}
+						}
+						visible = true;
+					}
+					// Force other UI components to resize
+					$(window).resize();
+				} catch (e) {
+					editor.getErrorBox().show(e);
+				}
+			});
 			$('#flint-sidebar-sparql').click(function(e) {
 				showTab("SPARQL", $(this).attr("id"));
 				e.stopPropagation();
@@ -1648,10 +1578,11 @@ function FlintEditor(container, imagesPath, config) {
 				if (datasetItem.modes) {
 					var i;
 					for (i = 0; i < datasetItem.modes.length; i++) {
-						if (datasetItem.modes[i] === "sparql11update") return;
+						if (datasetItem.modes[i] === "sparql11update")
+							return;
 					}
 				}
-				
+
 				if (datasetItem.properties == null) {
 					activeDataItem = datasetItem;
 					this.showActiveTab();
@@ -1666,12 +1597,10 @@ function FlintEditor(container, imagesPath, config) {
 									"Accept" : "application/sparql-results+json"
 								},
 								dataType : 'json',
-								error : function(XMLHttpRequest, textStatus,
-										errorThrown) {
+								error : function(XMLHttpRequest, textStatus, errorThrown) {
 									editor.getErrorBox().show(
 											"Properties cannot be retrieved. HTTP Status: "
-													+ XMLHttpRequest.status
-													+ ", " + errorThrown);
+													+ XMLHttpRequest.status + ", " + errorThrown);
 								},
 								success : function(data) {
 									datasetItem.properties = data;
@@ -1710,10 +1639,11 @@ function FlintEditor(container, imagesPath, config) {
 				if (datasetItem.modes) {
 					var i;
 					for (i = 0; i < datasetItem.modes.length; i++) {
-						if (datasetItem.modes[i] === "sparql11update") return;
+						if (datasetItem.modes[i] === "sparql11update")
+							return;
 					}
 				}
-				
+
 				if (datasetItem.classes == null) {
 					activeDataItem = datasetItem;
 					this.showActiveTab();
@@ -1728,12 +1658,10 @@ function FlintEditor(container, imagesPath, config) {
 									"Accept" : "application/sparql-results+json"
 								},
 								dataType : 'json',
-								error : function(XMLHttpRequest, textStatus,
-										errorThrown) {
+								error : function(XMLHttpRequest, textStatus, errorThrown) {
 									editor.getErrorBox().show(
 											"Classes cannot be retrieved. HTTP Status: "
-													+ XMLHttpRequest.status
-													+ ", " + errorThrown);
+													+ XMLHttpRequest.status + ", " + errorThrown);
 								},
 								success : function(data) {
 									datasetItem.classes = data;
@@ -2002,8 +1930,7 @@ function FlintEditor(container, imagesPath, config) {
 			function addFromCollectedURIs(set, varName) {
 				if (/:/.test(start)) {
 					// Prefix has been entered - give items matching prefix
-					var activeDataItem = editor.getSidebar()
-							.getActiveDataItem();
+					var activeDataItem = editor.getSidebar().getActiveDataItem();
 					if (activeDataItem) {
 						for ( var k = 0; k < activeDataItem.prefixes.length; k++) {
 							var ns = activeDataItem.prefixes[k].uri;
@@ -2011,15 +1938,14 @@ function FlintEditor(container, imagesPath, config) {
 								var fragments = activeDataItem[set].results.bindings[j][varName].value
 										.match(/(^\S*[#\/])([^#\/]*$)/);
 								if (fragments.length == 3 && fragments[1] == ns)
-									maybeAddCS(activeDataItem.prefixes[k].prefix
-											+ ":" + fragments[2]);
+									maybeAddCS(activeDataItem.prefixes[k].prefix + ":"
+											+ fragments[2]);
 							}
 						}
 					}
 				} else if (/^</.test(start)) {
 					// Looks like a URI - add matching URIs
-					var activeDataItem = editor.getSidebar()
-							.getActiveDataItem();
+					var activeDataItem = editor.getSidebar().getActiveDataItem();
 					if (activeDataItem) {
 						for ( var j = 0; j < activeDataItem[set].results.bindings.length; j++)
 							maybeAddCS("<"
@@ -2049,8 +1975,7 @@ function FlintEditor(container, imagesPath, config) {
 						maybeAddCS("'");
 					} else if (possibles[i] == "IRI_REF" && !/^</.test(start)) {
 						maybeAddCS("<");
-					} else if (possibles[i] == "BLANK_NODE_LABEL"
-							&& state.allowBnodes) {
+					} else if (possibles[i] == "BLANK_NODE_LABEL" && state.allowBnodes) {
 						maybeAddCS("_:");
 					} else if (possibles[i] == "a") {
 						// Property expected here - fetch possibilities
@@ -2058,12 +1983,12 @@ function FlintEditor(container, imagesPath, config) {
 						addFromCollectedURIs("properties", "p");
 					} else if (possibles[i] == "PNAME_LN" && !/:$/.test(start)) {
 						// prefixed names - offer prefixes
-						activeDataItem = editor.getSidebar()
-								.getActiveDataItem();
-						if (activeDataItem!==undefined && activeDataItem.prefixes!=undefined && activeDataItem.prefixes.length) {
+						activeDataItem = editor.getSidebar().getActiveDataItem();
+						if (activeDataItem !== undefined
+								&& activeDataItem.prefixes != undefined
+								&& activeDataItem.prefixes.length) {
 							for (j = 0; j < activeDataItem.prefixes.length; j++) {
-								maybeAddCS(activeDataItem.prefixes[j].prefix
-										+ ":");
+								maybeAddCS(activeDataItem.prefixes[j].prefix + ":");
 							}
 						}
 					}
@@ -2273,8 +2198,7 @@ function FlintEditor(container, imagesPath, config) {
 
 			if (tkposs != undefined) {
 				// Update keywords in the sidebar
-				flint.getSidebar()
-						.updateKeywords(tkposs.possibles, getButtonFn);
+				flint.getSidebar().updateKeywords(tkposs.possibles, getButtonFn);
 			}
 		}
 
@@ -2283,25 +2207,39 @@ function FlintEditor(container, imagesPath, config) {
 			updateKeywordTable();
 
 			if (cm.somethingSelected() != "") {
-				flint.getToolbar().setEnabled("Cut", true);
-				flint.getMenu().setEnabled("Cut", true);
+				if (flint.getToolbar)
+					flint.getToolbar().setEnabled("Cut", true);
+				if (flint.getMenu)
+					flint.getMenu().setEnabled("Cut", true);
 			} else {
-				flint.getToolbar().setEnabled("Cut", false);
-				flint.getMenu().setEnabled("Cut", false);
+				if (flint.getToolbar)
+					flint.getToolbar().setEnabled("Cut", false);
+				if (flint.getMenu)
+					flint.getMenu().setEnabled("Cut", false);
 			}
+			
 			if (cm.historySize().undo > 0) {
-				flint.getToolbar().setEnabled("Undo", true);
-				flint.getMenu().setEnabled("Undo", true);
+				if (flint.getToolbar)
+					flint.getToolbar().setEnabled("Undo", true);
+				if (flint.getMenu)
+					flint.getMenu().setEnabled("Undo", true);
 			} else {
-				flint.getToolbar().setEnabled("Undo", false);
-				flint.getMenu().setEnabled("Undo", false);
+				if (flint.getToolbar)
+					flint.getToolbar().setEnabled("Undo", false);
+				if (flint.getMenu)
+					flint.getMenu().setEnabled("Undo", false);
 			}
+			
 			if (cm.historySize().redo > 0) {
-				flint.getToolbar().setEnabled("Redo", true);
-				flint.getMenu().setEnabled("Redo", true);
+				if (flint.getToolbar)
+					flint.getToolbar().setEnabled("Redo", true);
+				if (flint.getMenu)
+					flint.getMenu().setEnabled("Redo", true);
 			} else {
-				flint.getToolbar().setEnabled("Redo", false);
-				flint.getMenu().setEnabled("Redo", false);
+				if (flint.getToolbar)
+					flint.getToolbar().setEnabled("Redo", false);
+				if (flint.getMenu)
+					flint.getMenu().setEnabled("Redo", false);
 			}
 
 			flint.getStatusArea().setLine(cm.getCursor().line);
@@ -2337,8 +2275,7 @@ function FlintEditor(container, imagesPath, config) {
 		function storeCurrentTab() {
 			var currentTabContent = cm.getValue();
 			tabItems[activeTab].setText(currentTabContent);
-			tabItems[activeTab].setCursor(cm.getCursor().line,
-					cm.getCursor().ch);
+			tabItems[activeTab].setCursor(cm.getCursor().line, cm.getCursor().ch);
 		}
 
 		function displayCurrentTab() {
@@ -2454,50 +2391,39 @@ function FlintEditor(container, imagesPath, config) {
 									+ "<textarea id='flint-code' name='query' cols='100' rows='1'>"
 									+ initialQuery + "</textarea></div>");
 
-			cm = CodeMirror.fromTextArea(document.getElementById("flint-code"),
-					{
-						mode : editorMode,
-						lineNumbers : true,
-						indentUnit : 3,
-						tabMode : "indent",
-						matchBrackets : true,
-						onHighlightComplete : cmUpdate,
-						onCursorActivity : cmCursor,
-						onKeyEvent : autocompleteKeyEventHandler
-					});
+			cm = CodeMirror.fromTextArea(document.getElementById("flint-code"), {
+				mode : editorMode,
+				lineNumbers : true,
+				indentUnit : 3,
+				tabMode : "indent",
+				matchBrackets : true,
+				onHighlightComplete : cmUpdate,
+				onCursorActivity : cmCursor,
+				onKeyEvent : autocompleteKeyEventHandler
+			});
 
 			this.addTab(initialQuery);
 			var containerWidth = $('#flint-editor-tabs-container').width();
 			$('#flint-editor-tabs').css('max-width', containerWidth - 70);
 
-			$('#flint-scroll-tabs-left')
-					.click(
-							function() {
-								if (tabOffset > 0
-										&& $('#flint-scroll-tabs-left').css(
-												'opacity') == 1) {
-									tabOffset--;
-									$(
-											'#flint-editor-tabs li:eq('
-													+ tabOffset + ')').show();
-									checkTabScroll();
-								}
-							});
+			$('#flint-scroll-tabs-left').click(function() {
+				if (tabOffset > 0 && $('#flint-scroll-tabs-left').css('opacity') == 1) {
+					tabOffset--;
+					$('#flint-editor-tabs li:eq(' + tabOffset + ')').show();
+					checkTabScroll();
+				}
+			});
 
-			$('#flint-scroll-tabs-right')
-					.click(
-							function() {
-								var functioningTabs = getFunctioningTabs();
-								if (tabOffset < (functioningTabs - spaceForTabsCount)
-										&& $('#flint-scroll-tabs-right').css(
-												'opacity') == 1) {
-									tabOffset++;
-									$(
-											'#flint-editor-tabs li:lt('
-													+ tabOffset + ')').hide();
-									checkTabScroll();
-								}
-							});
+			$('#flint-scroll-tabs-right').click(
+					function() {
+						var functioningTabs = getFunctioningTabs();
+						if (tabOffset < (functioningTabs - spaceForTabsCount)
+								&& $('#flint-scroll-tabs-right').css('opacity') == 1) {
+							tabOffset++;
+							$('#flint-editor-tabs li:lt(' + tabOffset + ')').hide();
+							checkTabScroll();
+						}
+					});
 
 		};
 
@@ -2552,96 +2478,81 @@ function FlintEditor(container, imagesPath, config) {
 		// Keywords can be grouped using a string for the second array item
 		this.sparql1Keywords = [ [ "BASE", "" ], [ "PREFIX", "" ],
 				[ "SELECT", "" ], [ "ASK", "" ], [ "CONSTRUCT", "" ],
-				[ "DESCRIBE", "" ], [ "DISTINCT", "MODIFIER" ],
-				[ "REDUCED", "" ], [ "FROM", "" ], [ "NAMED", "" ],
-				[ "WHERE", "" ], [ "GRAPH", "" ], [ "UNION", "" ],
-				[ "FILTER", "" ], [ "OPTIONAL", "" ], [ "ORDER", "MODIFIER" ],
-				[ "LIMIT", "MODIFIER" ], [ "OFFSET", "MODIFIER" ],
-				[ "BY", "MODIFIER" ], [ "ASC", "" ], [ "DESC", "" ],
-				[ "STR", "STRING" ], [ "LANG", "" ],
-				[ "LANGMATCHES", "STRING" ], [ "DATATYPE", "" ],
-				[ "BOUND", "" ], [ "SAMETERM", "" ], [ "ISIRI", "TERM" ],
-				[ "ISURI", "TERM" ], [ "ISBLANK", "TERM" ],
-				[ "ISLITERAL", "TERM" ], [ "REGEX", "STRING" ] ];
+				[ "DESCRIBE", "" ], [ "DISTINCT", "MODIFIER" ], [ "REDUCED", "" ],
+				[ "FROM", "" ], [ "NAMED", "" ], [ "WHERE", "" ], [ "GRAPH", "" ],
+				[ "UNION", "" ], [ "FILTER", "" ], [ "OPTIONAL", "" ],
+				[ "ORDER", "MODIFIER" ], [ "LIMIT", "MODIFIER" ],
+				[ "OFFSET", "MODIFIER" ], [ "BY", "MODIFIER" ], [ "ASC", "" ],
+				[ "DESC", "" ], [ "STR", "STRING" ], [ "LANG", "" ],
+				[ "LANGMATCHES", "STRING" ], [ "DATATYPE", "" ], [ "BOUND", "" ],
+				[ "SAMETERM", "" ], [ "ISIRI", "TERM" ], [ "ISURI", "TERM" ],
+				[ "ISBLANK", "TERM" ], [ "ISLITERAL", "TERM" ], [ "REGEX", "STRING" ] ];
 
-		this.sparql11Query = [ [ "BASE", "" ], [ "PREFIX", "" ],
-				[ "SELECT", "" ], [ "ASK", "" ], [ "CONSTRUCT", "" ],
-				[ "DESCRIBE", "" ], [ "DISTINCT", "MODIFIER" ],
-				[ "REDUCED", "" ], [ "FROM", "" ], [ "NAMED", "" ],
-				[ "WHERE", "" ], [ "GRAPH", "" ], [ "UNION", "" ],
+		this.sparql11Query = [ [ "BASE", "" ], [ "PREFIX", "" ], [ "SELECT", "" ],
+				[ "ASK", "" ], [ "CONSTRUCT", "" ], [ "DESCRIBE", "" ],
+				[ "DISTINCT", "MODIFIER" ], [ "REDUCED", "" ], [ "FROM", "" ],
+				[ "NAMED", "" ], [ "WHERE", "" ], [ "GRAPH", "" ], [ "UNION", "" ],
 				[ "FILTER", "" ], [ "OPTIONAL", "" ], [ "ORDER", "MODIFIER" ],
 				[ "LIMIT", "MODIFIER" ], [ "OFFSET", "MODIFIER" ],
 				[ "BY", "MODIFIER" ], [ "ASC", "" ], [ "DESC", "" ],
-				[ "STR", "STRING" ], [ "LANG", "" ],
-				[ "LANGMATCHES", "STRING" ], [ "DATATYPE", "" ],
-				[ "BOUND", "" ], [ "SAMETERM", "" ], [ "ISIRI", "TERM" ],
-				[ "ISURI", "TERM" ], [ "ISBLANK", "TERM" ],
-				[ "ISLITERAL", "TERM" ], [ "REGEX", "STRING" ],
-				[ "HAVING", "" ], [ "GROUP", "" ], [ "VALUES", "" ],
-				[ "IF", "" ], [ "COALESCE", "" ], [ "EXISTS", "" ],
-				[ "NOT", "" ], [ "ISNUMERIC", "TERM" ], [ "IRI", "TERM" ],
-				[ "BNODE", "TERM" ], [ "STRDT", "TERM" ],
-				[ "STRLANG", "TERM" ], [ "UUID", "TERM" ],
-				[ "STRUUID", "TERM" ], [ "STRLEN", "STRING" ],
-				[ "SUBSTR", "STRING" ], [ "LCASE", "STRING" ],
+				[ "STR", "STRING" ], [ "LANG", "" ], [ "LANGMATCHES", "STRING" ],
+				[ "DATATYPE", "" ], [ "BOUND", "" ], [ "SAMETERM", "" ],
+				[ "ISIRI", "TERM" ], [ "ISURI", "TERM" ], [ "ISBLANK", "TERM" ],
+				[ "ISLITERAL", "TERM" ], [ "REGEX", "STRING" ], [ "HAVING", "" ],
+				[ "GROUP", "" ], [ "VALUES", "" ], [ "IF", "" ], [ "COALESCE", "" ],
+				[ "EXISTS", "" ], [ "NOT", "" ], [ "ISNUMERIC", "TERM" ],
+				[ "IRI", "TERM" ], [ "BNODE", "TERM" ], [ "STRDT", "TERM" ],
+				[ "STRLANG", "TERM" ], [ "UUID", "TERM" ], [ "STRUUID", "TERM" ],
+				[ "STRLEN", "STRING" ], [ "SUBSTR", "STRING" ], [ "LCASE", "STRING" ],
 				[ "UCASE", "STRING" ], [ "STRSTARTS", "STRING" ],
 				[ "STRENDS", "STRING" ], [ "CONTAINS", "STRING" ],
 				[ "STRBEFORE", "STRING" ], [ "STRAFTER", "STRING" ],
 				[ "ENCODE_FOR_URI", "STRING" ], [ "CONCAT", "STRING" ],
 				[ "REPLACE", "STRING" ], [ "NOW", "DATE" ], [ "YEAR", "DATE" ],
 				[ "MONTH", "DATE" ], [ "DAY", "DATE" ], [ "HOURS", "DATE" ],
-				[ "MINUTES", "DATE" ], [ "SECONDS", "DATE" ],
-				[ "TIMEZONE", "DATE" ], [ "TZ", "DATE" ], [ "MD5", "HASH" ],
-				[ "SHA1", "HASH" ], [ "SHA256", "HASH" ], [ "SHA384", "HASH" ],
-				[ "SHA512", "HASH" ], [ "ABS", "NUMERIC" ],
-				[ "ROUND", "NUMERIC" ], [ "CEIL", "NUMERIC" ],
+				[ "MINUTES", "DATE" ], [ "SECONDS", "DATE" ], [ "TIMEZONE", "DATE" ],
+				[ "TZ", "DATE" ], [ "MD5", "HASH" ], [ "SHA1", "HASH" ],
+				[ "SHA256", "HASH" ], [ "SHA384", "HASH" ], [ "SHA512", "HASH" ],
+				[ "ABS", "NUMERIC" ], [ "ROUND", "NUMERIC" ], [ "CEIL", "NUMERIC" ],
 				[ "FLOOR", "NUMERIC" ], [ "RAND", "NUMERIC" ],
 				[ "REDUCED", "MODIFIER" ], [ "COUNT", "AGGREGATE" ],
-				[ "SUM", "AGGREGATE" ], [ "MIN", "AGGREGATE" ],
-				[ "MAX", "AGGREGATE" ], [ "AVG", "AGGREGATE" ],
-				[ "SAMPLE", "AGGREGATE" ], [ "GROUP_CONCAT", "AGGREGATE" ] ];
+				[ "SUM", "AGGREGATE" ], [ "MIN", "AGGREGATE" ], [ "MAX", "AGGREGATE" ],
+				[ "AVG", "AGGREGATE" ], [ "SAMPLE", "AGGREGATE" ],
+				[ "GROUP_CONCAT", "AGGREGATE" ] ];
 
-		this.sparql11Update = [ [ "BASE", "" ], [ "PREFIX", "" ],
-				[ "SELECT", "" ], [ "DISTINCT", "MODIFIER" ],
-				[ "REDUCED", "" ], [ "NAMED", "" ], [ "WHERE", "" ],
-				[ "GRAPH", "" ], [ "TO", "UPDATE" ], [ "USING", "" ],
-				[ "DEFAULT", "" ], [ "ALL", "" ], [ "UNION", "" ],
-				[ "FILTER", "" ], [ "OPTIONAL", "" ], [ "ORDER", "MODIFIER" ],
-				[ "LIMIT", "MODIFIER" ], [ "OFFSET", "MODIFIER" ],
-				[ "BY", "MODIFIER" ], [ "ASC", "" ], [ "DESC", "" ],
-				[ "STR", "STRING" ], [ "LANG", "" ],
-				[ "LANGMATCHES", "STRING" ], [ "DATATYPE", "" ],
-				[ "BOUND", "" ], [ "SAMETERM", "" ], [ "ISIRI", "TERM" ],
-				[ "ISURI", "TERM" ], [ "ISBLANK", "TERM" ],
-				[ "ISLITERAL", "TERM" ], [ "REGEX", "STRING" ],
-				[ "HAVING", "" ], [ "GROUP", "" ], [ "VALUES", "" ],
-				[ "IF", "" ], [ "COALESCE", "" ], [ "EXISTS", "" ],
-				[ "NOT", "" ], [ "ISNUMERIC", "TERM" ], [ "IRI", "TERM" ],
-				[ "BNODE", "TERM" ], [ "STRDT", "TERM" ],
-				[ "STRLANG", "TERM" ], [ "UUID", "TERM" ],
-				[ "STRUUID", "TERM" ], [ "STRLEN", "STRING" ],
-				[ "SUBSTR", "STRING" ], [ "LCASE", "STRING" ],
-				[ "UCASE", "STRING" ], [ "STRSTARTS", "STRING" ],
-				[ "STRENDS", "STRING" ], [ "CONTAINS", "STRING" ],
-				[ "STRBEFORE", "STRING" ], [ "STRAFTER", "STRING" ],
-				[ "ENCODE_FOR_URI", "STRING" ], [ "CONCAT", "STRING" ],
-				[ "REPLACE", "STRING" ], [ "NOW", "DATE" ], [ "YEAR", "DATE" ],
-				[ "MONTH", "DATE" ], [ "DAY", "DATE" ], [ "HOURS", "DATE" ],
-				[ "MINUTES", "DATE" ], [ "SECONDS", "DATE" ],
+		this.sparql11Update = [ [ "BASE", "" ], [ "PREFIX", "" ], [ "SELECT", "" ],
+				[ "DISTINCT", "MODIFIER" ], [ "REDUCED", "" ], [ "NAMED", "" ],
+				[ "WHERE", "" ], [ "GRAPH", "" ], [ "TO", "UPDATE" ], [ "USING", "" ],
+				[ "DEFAULT", "" ], [ "ALL", "" ], [ "UNION", "" ], [ "FILTER", "" ],
+				[ "OPTIONAL", "" ], [ "ORDER", "MODIFIER" ], [ "LIMIT", "MODIFIER" ],
+				[ "OFFSET", "MODIFIER" ], [ "BY", "MODIFIER" ], [ "ASC", "" ],
+				[ "DESC", "" ], [ "STR", "STRING" ], [ "LANG", "" ],
+				[ "LANGMATCHES", "STRING" ], [ "DATATYPE", "" ], [ "BOUND", "" ],
+				[ "SAMETERM", "" ], [ "ISIRI", "TERM" ], [ "ISURI", "TERM" ],
+				[ "ISBLANK", "TERM" ], [ "ISLITERAL", "TERM" ], [ "REGEX", "STRING" ],
+				[ "HAVING", "" ], [ "GROUP", "" ], [ "VALUES", "" ], [ "IF", "" ],
+				[ "COALESCE", "" ], [ "EXISTS", "" ], [ "NOT", "" ],
+				[ "ISNUMERIC", "TERM" ], [ "IRI", "TERM" ], [ "BNODE", "TERM" ],
+				[ "STRDT", "TERM" ], [ "STRLANG", "TERM" ], [ "UUID", "TERM" ],
+				[ "STRUUID", "TERM" ], [ "STRLEN", "STRING" ], [ "SUBSTR", "STRING" ],
+				[ "LCASE", "STRING" ], [ "UCASE", "STRING" ],
+				[ "STRSTARTS", "STRING" ], [ "STRENDS", "STRING" ],
+				[ "CONTAINS", "STRING" ], [ "STRBEFORE", "STRING" ],
+				[ "STRAFTER", "STRING" ], [ "ENCODE_FOR_URI", "STRING" ],
+				[ "CONCAT", "STRING" ], [ "REPLACE", "STRING" ], [ "NOW", "DATE" ],
+				[ "YEAR", "DATE" ], [ "MONTH", "DATE" ], [ "DAY", "DATE" ],
+				[ "HOURS", "DATE" ], [ "MINUTES", "DATE" ], [ "SECONDS", "DATE" ],
 				[ "TIMEZONE", "DATE" ], [ "TZ", "DATE" ], [ "MD5", "HASH" ],
 				[ "SHA1", "HASH" ], [ "SHA256", "HASH" ], [ "SHA384", "HASH" ],
-				[ "SHA512", "HASH" ], [ "ABS", "NUMERIC" ],
-				[ "ROUND", "NUMERIC" ], [ "CEIL", "NUMERIC" ],
-				[ "FLOOR", "NUMERIC" ], [ "RAND", "NUMERIC" ],
+				[ "SHA512", "HASH" ], [ "ABS", "NUMERIC" ], [ "ROUND", "NUMERIC" ],
+				[ "CEIL", "NUMERIC" ], [ "FLOOR", "NUMERIC" ], [ "RAND", "NUMERIC" ],
 				[ "REDUCED", "MODIFIER" ], [ "COUNT", "AGGREGATE" ],
-				[ "SUM", "AGGREGATE" ], [ "MIN", "AGGREGATE" ],
-				[ "MAX", "AGGREGATE" ], [ "AVG", "AGGREGATE" ],
-				[ "SAMPLE", "AGGREGATE" ], [ "GROUP_CONCAT", "AGGREGATE" ],
-				[ "DATA", "UPDATE" ], [ "INSERT", "UPDATE" ],
-				[ "DELETE", "UPDATE" ], [ "CREATE", "UPDATE" ],
-				[ "DROP", "UPDATE" ], [ "COPY", "UPDATE" ],
-				[ "MOVE", "UPDATE" ], [ "ADD", "UPDATE" ],
-				[ "LOAD", "UPDATE" ], [ "INTO", "UPDATE" ],
+				[ "SUM", "AGGREGATE" ], [ "MIN", "AGGREGATE" ], [ "MAX", "AGGREGATE" ],
+				[ "AVG", "AGGREGATE" ], [ "SAMPLE", "AGGREGATE" ],
+				[ "GROUP_CONCAT", "AGGREGATE" ], [ "DATA", "UPDATE" ],
+				[ "INSERT", "UPDATE" ], [ "DELETE", "UPDATE" ], [ "CREATE", "UPDATE" ],
+				[ "DROP", "UPDATE" ], [ "COPY", "UPDATE" ], [ "MOVE", "UPDATE" ],
+				[ "ADD", "UPDATE" ], [ "LOAD", "UPDATE" ], [ "INTO", "UPDATE" ],
 				[ "WITH", "UPDATE" ], [ "SILENT", "UPDATE" ] ];
 
 		try {
@@ -2652,7 +2563,7 @@ function FlintEditor(container, imagesPath, config) {
 
 			// Returns the version of the software
 			this.getVersion = function() {
-				return "1.0.2";
+				return "1.0.3";
 			};
 
 			// Returns the title of the software
@@ -2662,16 +2573,15 @@ function FlintEditor(container, imagesPath, config) {
 
 			if ($.browser.msie) {
 				$('#' + container).append(
-						"<form id='" + editorId + "' action='"
-								+ config.endpoints[0].uri
+						"<form id='" + editorId + "' action='" + config.endpoints[0].uri
 								+ "' method='post'></form>");
 			} else {
 				$('#' + container).append("<div id='" + editorId + "'></div>");
 			}
 
 			$('#' + editorId).append(
-					"<h1 id='flint-title'>" + this.getTitle() + " "
-							+ this.getVersion() + "</h1>");
+					"<h1 id='flint-title'>" + this.getTitle() + " " + this.getVersion()
+							+ "</h1>");
 
 			// Add menu
 			if (config.interface.menu) {
@@ -2694,8 +2604,7 @@ function FlintEditor(container, imagesPath, config) {
 			var createSidebar = new FlintSidebar(flint, config);
 			var createEndpointBar = new FlintEndpointBar(config, flint);
 			var endpointItem = createEndpointBar.getItems()[0], endpointGetInfoButton = createEndpointBar
-					.getItems()[2], endpointMimeTypeItem = createEndpointBar
-					.getItems()[3];
+					.getItems()[2], endpointMimeTypeItem = createEndpointBar.getItems()[3];
 
 			// Add endpoint bar
 			try {
@@ -2713,30 +2622,20 @@ function FlintEditor(container, imagesPath, config) {
 								// If we haven't already retrieved the data
 								// prompt
 								if (endpointItem.getItem(endpointUrl) === null) {
-									flint
-											.getConfirmDialog()
-											.setCloseAction(
-													function() {
-														if (flint
-																.getConfirmDialog()
-																.getResult() === "Okay") {
-															// We'll store the
-															// data against the
-															// endpoint URL
-															endpointItem
-																	.addItem();
-															if (!$.browser.msie) {
-																var epItem = endpointItem
-																		.getItem(endpointUrl);
-																createSidebar
-																		.updateProperties(epItem);
-																createSidebar
-																		.updateClasses(epItem);
-																createSidebar
-																		.updateSamples(epItem);
-															}
-														}
-													});
+									flint.getConfirmDialog().setCloseAction(function() {
+										if (flint.getConfirmDialog().getResult() === "Okay") {
+											// We'll store the
+											// data against the
+											// endpoint URL
+											endpointItem.addItem();
+											if (!$.browser.msie) {
+												var epItem = endpointItem.getItem(endpointUrl);
+												createSidebar.updateProperties(epItem);
+												createSidebar.updateClasses(epItem);
+												createSidebar.updateSamples(epItem);
+											}
+										}
+									});
 									flint
 											.getConfirmDialog()
 											.show(
@@ -2769,25 +2668,33 @@ function FlintEditor(container, imagesPath, config) {
 			this.setModeRelatedItems = function(mode) {
 
 				if (mode === "sparql10" || mode === "sparql11query") {
-					createToolbar.setEnabled("Select", true);
-					createToolbar.setEnabled("Construct", true);
-					createToolbar.setEnabled("Insert", false);
-					createToolbar.setEnabled("Delete", false);
-					createMenu.setEnabled("SelectQuery", true);
-					createMenu.setEnabled("ConstructQuery", true);
-					createMenu.setEnabled("InsertQuery", false);
-					createMenu.setEnabled("DeleteQuery", false);
+					if (createToolbar) {
+						createToolbar.setEnabled("Select", true);
+						createToolbar.setEnabled("Construct", true);
+						createToolbar.setEnabled("Insert", false);
+						createToolbar.setEnabled("Delete", false);
+					}
+					if (createMenu) {
+						createMenu.setEnabled("SelectQuery", true);
+						createMenu.setEnabled("ConstructQuery", true);
+						createMenu.setEnabled("InsertQuery", false);
+						createMenu.setEnabled("DeleteQuery", false);
+					}
 				}
 
 				if (mode === "sparql11update") {
-					createToolbar.setEnabled("Select", false);
-					createToolbar.setEnabled("Construct", false);
-					createToolbar.setEnabled("Insert", true);
-					createToolbar.setEnabled("Delete", true);
-					createMenu.setEnabled("SelectQuery", false);
-					createMenu.setEnabled("ConstructQuery", false);
-					createMenu.setEnabled("InsertQuery", true);
-					createMenu.setEnabled("DeleteQuery", true);
+					if (createToolbar) {
+						createToolbar.setEnabled("Select", false);
+						createToolbar.setEnabled("Construct", false);
+						createToolbar.setEnabled("Insert", true);
+						createToolbar.setEnabled("Delete", true);
+					}
+					if (createMenu) {
+						createMenu.setEnabled("SelectQuery", false);
+						createMenu.setEnabled("ConstructQuery", false);
+						createMenu.setEnabled("InsertQuery", true);
+						createMenu.setEnabled("DeleteQuery", true);
+					}
 				}
 			};
 
@@ -2824,18 +2731,17 @@ function FlintEditor(container, imagesPath, config) {
 
 			datasetItems.setChangeAction(function() {
 				if ($.browser.msie) {
-					$('#' + editorId)
-							.attr('action', datasetItems.getEndpoint());
+					$('#' + editorId).attr('action', datasetItems.getEndpoint());
 				} else {
 					// Update necessary items with data from configuration
-					coolbarModeItems.updateModes(datasetItems
-							.getItem(datasetItems.getEndpoint()));
-					createSidebar.updateProperties(datasetItems
-							.getItem(datasetItems.getEndpoint()));
-					createSidebar.updateClasses(datasetItems
-							.getItem(datasetItems.getEndpoint()));
-					createSidebar.updateSamples(datasetItems
-							.getItem(datasetItems.getEndpoint()));
+					coolbarModeItems.updateModes(datasetItems.getItem(datasetItems
+							.getEndpoint()));
+					createSidebar.updateProperties(datasetItems.getItem(datasetItems
+							.getEndpoint()));
+					createSidebar.updateClasses(datasetItems.getItem(datasetItems
+							.getEndpoint()));
+					createSidebar.updateSamples(datasetItems.getItem(datasetItems
+							.getEndpoint()));
 				}
 			});
 
@@ -2879,32 +2785,27 @@ function FlintEditor(container, imagesPath, config) {
 					}
 					paramsData[paramsDataItem] = cm.getCodeMirror().getValue();
 					var mimeType = datasetMimeTypeItem.getMimeType();
-					$
-							.ajax({
-								url : datasetItems.getEndpoint(),
-								type : 'post',
-								data : paramsData,
-								headers : {
-									"Accept" : mimeType
-								},
-								dataType : 'text',
-								error : function(XMLHttpRequest, textStatus,
-										errorThrown) {
-									if (XMLHttpRequest.status == 0) {
-										errorBox
-												.show("The request was not sent. You may be offline");
-									} else {
-										errorBox
-												.show("Dataset Request: HTTP Status: "
-														+ XMLHttpRequest.status
-														+ "; " + textStatus);
-									}
-									resultsArea.showLoading(false);
-								},
-								success : function(data) {
-									resultsArea.setResults(data);
-								}
-							});
+					$.ajax({
+						url : datasetItems.getEndpoint(),
+						type : 'post',
+						data : paramsData,
+						headers : {
+							"Accept" : mimeType
+						},
+						dataType : 'text',
+						error : function(XMLHttpRequest, textStatus, errorThrown) {
+							if (XMLHttpRequest.status == 0) {
+								errorBox.show("The request was not sent. You may be offline");
+							} else {
+								errorBox.show("Dataset Request: HTTP Status: "
+										+ XMLHttpRequest.status + "; " + textStatus);
+							}
+							resultsArea.showLoading(false);
+						},
+						success : function(data) {
+							resultsArea.setResults(data);
+						}
+					});
 				} catch (e) {
 					errorBox.show("Cannot send dataset query: " + e);
 				}
@@ -2924,32 +2825,27 @@ function FlintEditor(container, imagesPath, config) {
 					}
 					paramsData[paramsDataItem] = cm.getCodeMirror().getValue();
 					var mimeType = endpointMimeTypeItem.getMimeType();
-					$
-							.ajax({
-								url : endpointItem.getEndpoint(),
-								type : 'post',
-								data : paramsData,
-								headers : {
-									"Accept" : mimeType
-								},
-								dataType : 'text',
-								error : function(XMLHttpRequest, textStatus,
-										errorThrown) {
-									if (XMLHttpRequest.status == 0) {
-										errorBox
-												.show("The request was not sent. You may be offline.");
-									} else {
-										errorBox
-												.show("Endpoint Request: HTTP Status: "
-														+ XMLHttpRequest.status
-														+ "; " + textStatus);
-									}
-									resultsArea.showLoading(false);
-								},
-								success : function(data) {
-									resultsArea.setResults(data);
-								}
-							});
+					$.ajax({
+						url : endpointItem.getEndpoint(),
+						type : 'post',
+						data : paramsData,
+						headers : {
+							"Accept" : mimeType
+						},
+						dataType : 'text',
+						error : function(XMLHttpRequest, textStatus, errorThrown) {
+							if (XMLHttpRequest.status == 0) {
+								errorBox.show("The request was not sent. You may be offline.");
+							} else {
+								errorBox.show("Endpoint Request: HTTP Status: "
+										+ XMLHttpRequest.status + "; " + textStatus);
+							}
+							resultsArea.showLoading(false);
+						},
+						success : function(data) {
+							resultsArea.setResults(data);
+						}
+					});
 				} catch (e) {
 					errorBox.show("Cannot send endpoint query: " + e);
 				}
@@ -3007,9 +2903,8 @@ function FlintEditor(container, imagesPath, config) {
 						}
 
 					});
-					confirmDialog
-							.show("New Query",
-									"<p>Are you sure you want to abandon the current text?</p>");
+					confirmDialog.show("New Query",
+							"<p>Are you sure you want to abandon the current text?</p>");
 				}
 			};
 
@@ -3083,30 +2978,24 @@ function FlintEditor(container, imagesPath, config) {
 
 			this.insertQuery = function(title, query, line, ch) {
 				if (cm.getCodeMirror().getValue() != "") {
-					confirmDialog
-							.setCloseAction(function() {
-								var result = confirmDialog.getResult();
-								if (result == "Okay") {
-									cm.getCodeMirror().setValue(
-											createSidebar.getPrefixes() + "\n"
-													+ query);
-									cm.getCodeMirror().setCursor(
-											line
-													+ createSidebar
-															.getPrefixCount(),
-											ch);
-									flint.formatQuery();
-									cm.getCodeMirror().focus();
-								}
-							});
-					confirmDialog
-							.show(title,
-									"<p>Are you sure you want to abandon the current text?</p>");
+					confirmDialog.setCloseAction(function() {
+						var result = confirmDialog.getResult();
+						if (result == "Okay") {
+							cm.getCodeMirror().setValue(
+									createSidebar.getPrefixes() + "\n" + query);
+							cm.getCodeMirror().setCursor(
+									line + createSidebar.getPrefixCount(), ch);
+							flint.formatQuery();
+							cm.getCodeMirror().focus();
+						}
+					});
+					confirmDialog.show(title,
+							"<p>Are you sure you want to abandon the current text?</p>");
 				} else {
 					cm.getCodeMirror().setValue(
 							createSidebar.getPrefixes() + "\n" + query);
-					cm.getCodeMirror().setCursor(
-							line + createSidebar.getPrefixCount(), ch);
+					cm.getCodeMirror().setCursor(line + createSidebar.getPrefixCount(),
+							ch);
 					this.formatQuery();
 					cm.getCodeMirror().focus();
 				}
@@ -3118,11 +3007,8 @@ function FlintEditor(container, imagesPath, config) {
 			};
 
 			this.insertConstructQuery = function() {
-				this
-						.insertQuery(
-								"New Construct Query",
-								"CONSTRUCT {\n?s ?p ?o\n} WHERE {\n?s ?p ?o\n}\nLIMIT 10",
-								2, 0);
+				this.insertQuery("New Construct Query",
+						"CONSTRUCT {\n?s ?p ?o\n} WHERE {\n?s ?p ?o\n}\nLIMIT 10", 2, 0);
 			};
 
 			this.insertInsertQuery = function() {
@@ -3143,34 +3029,30 @@ function FlintEditor(container, imagesPath, config) {
 			};
 
 			// Handle window resizing
-			$(window).resize(
-					function() {
-						// Resize editing area. Should this be in the
-						// FlintCodeEditor object?
-						// Will be triggered by window resize and sidebar
-						// display/hiding
-						var editorWidth = $('#flint-editor').width();
-						if (!createSidebar.visible()) {
-							$('.CodeMirror').css("width",
-									(editorWidth - 55) + "px");
-						} else {
-							$('#flint-sidebar').css("width",
-									editorWidth / 2 + "px");
-							$('.CodeMirror').css("width",
-									((editorWidth / 2) - 25) + "px");
-						}
-						cm.resize();
-					});
+			$(window).resize(function() {
+				// Resize editing area. Should this be in the
+				// FlintCodeEditor object?
+				// Will be triggered by window resize and sidebar
+				// display/hiding
+				var editorWidth = $('#flint-editor').width();
+				if (!createSidebar.visible()) {
+					$('.CodeMirror').css("width", (editorWidth - 55) + "px");
+				} else {
+					$('#flint-sidebar').css("width", editorWidth / 2 + "px");
+					$('.CodeMirror').css("width", ((editorWidth / 2) - 25) + "px");
+				}
+				cm.resize();
+			});
 
 			if (!$.browser.msie) {
 				resultsArea.display(editorId);
 				try {
-					createSidebar.updateProperties(datasetItems
-							.getItem(datasetItems.getEndpoint()));
-					createSidebar.updateClasses(datasetItems
-							.getItem(datasetItems.getEndpoint()));
-					createSidebar.updateSamples(datasetItems
-							.getItem(datasetItems.getEndpoint()));
+					createSidebar.updateProperties(datasetItems.getItem(datasetItems
+							.getEndpoint()));
+					createSidebar.updateClasses(datasetItems.getItem(datasetItems
+							.getEndpoint()));
+					createSidebar.updateSamples(datasetItems.getItem(datasetItems
+							.getEndpoint()));
 				} catch (e) {
 					errorBox.show(e);
 				}
