@@ -367,21 +367,29 @@ CodeMirror.defineMode("%%%modename%%%", function(config, parserConfig) {
 	var indentTop={
 		"*[,, object]": 3,
 		"*[ (,), object]": 3,
-		"?[verb, objectList]": 1,
+		"*[ (,), objectPath]": 3,
+		"*[/, pathEltOrInverse]": 2,
 		"object": 2,
+		"objectPath": 2,
 		"objectList": 2,
 		"objectListPath": 2,
 		"storeProperty": 2,
+		"pathMod": 2,
+		"?pathMod": 2,
 		"propertyListNotEmpty": 1,
 		"propertyList": 1,
 		"propertyListPath": 1,
-		"propertyListPathNotEmpty": 1
+		"propertyListPathNotEmpty": 1,
+		"?[verb, objectList]": 1,
+		"?[or([verbPath, verbSimple]), objectList]": 1
 	};
 
 	var indentTable={
 		"}":1,
 		"]":0,
-		")":1
+		")":1,
+		"{":-1,
+		"(":-1
 	};
 
 	function indent(state, textAfter) {
